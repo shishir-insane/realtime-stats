@@ -1,3 +1,9 @@
+/**
+ * AppUtils.java
+ * realtime-stats
+ * 
+ * @author Shishir Kumar
+ */
 package com.sk.sales.stats.util;
 
 public final class AppUtils {

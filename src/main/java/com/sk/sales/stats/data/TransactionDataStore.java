@@ -1,3 +1,9 @@
+/**
+ * TransactionDataStore.java
+ * realtime-stats
+ *
+ * @author Shishir Kumar
+ */
 package com.sk.sales.stats.data;
 
 import java.util.Date;
@@ -25,31 +31,43 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
 
     private AggregatedSalesData tailData;
 
+    /**
+     * Instantiates a new transaction data store.
+     */
     public TransactionDataStore() {
         super();
         tailData = null;
     }
 
-    public boolean addSalesData(final double salesAmount, final Date saleTimestamp) {
-        return add(new AggregatedSalesData(salesAmount, saleTimestamp));
-
+    /**
+     * Adds the sales data.
+     *
+     * @param salesAmount
+     *            the sales amount
+     * @param saleTimestamp
+     *            the sale timestamp
+     */
+    public void addSalesData(final double salesAmount, final Date saleTimestamp) {
+        add(new AggregatedSalesData(salesAmount, saleTimestamp));
     }
 
     /**
-     * This method to add the data to the data store while maintaining the max
-     * size of the data collection
+     * This method to add the data to the data store while bounding the max size
+     * of the data collection. As the queue size is bounded after insertion,
+     * this method will never throw IllegalStateException or return false.
      *
-     * @param data
-     * @return
+     * @param aggregatedSalesData
+     *            the aggregated sales data
+     * @return true, if successful
      */
     @Override
-    public boolean add(final AggregatedSalesData data) {
+    public boolean add(final AggregatedSalesData aggregatedSalesData) {
         boolean isInserted = false;
-        if (shouldInsertAtTail(data.getDataTimeStamp())) {
-            isInserted = super.add(data);
-            tailData = data;
+        if (shouldInsertAtTail(aggregatedSalesData.getDataTimeStamp())) {
+            isInserted = offer(aggregatedSalesData);
+            tailData = aggregatedSalesData;
         } else {
-            tailData.updateTransactionData(data.getTotalAmount());
+            tailData.updateTransactionData(aggregatedSalesData.getTotalAmount());
         }
         if (size() > AppUtils.DEFAULT_SIZE) {
             remove();
@@ -68,14 +86,16 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
     }
 
     /**
+     * Should insert at tail.
      *
-     * @param data
-     * @return
+     * @param saleTimestamp
+     *            the sale timestamp
+     * @return true, if successful
      */
     private boolean shouldInsertAtTail(final Date saleTimestamp) {
         boolean shouldInsert = false;
         final long saleTimeStampInSecs = saleTimestamp.getTime() / 1000;
-        if (size() == 0 || saleTimeStampInSecs - tailData.getDataTimeStampInSecs() > 0) {
+        if (null == tailData || saleTimeStampInSecs - tailData.getDataTimeStampInSecs() > 0) {
             shouldInsert = true;
         }
         return shouldInsert;

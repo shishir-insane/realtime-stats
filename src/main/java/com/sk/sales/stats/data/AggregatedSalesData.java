@@ -40,7 +40,11 @@ public class AggregatedSalesData implements Serializable {
     public AggregatedSalesData(final double saleAmount, final Date saleTimeStamp) {
         totalAmount = saleAmount;
         salesQty = 1;
-        dataTimeStamp = saleTimeStamp;
+        if (null != saleTimeStamp) {
+            dataTimeStamp = new Date(saleTimeStamp.getTime());
+        } else {
+            dataTimeStamp = null;
+        }
     }
 
     /**
@@ -67,7 +71,11 @@ public class AggregatedSalesData implements Serializable {
      * @return the data time stamp
      */
     public Date getDataTimeStamp() {
-        return dataTimeStamp;
+        Date timeStamp = null;
+        if (null != dataTimeStamp) {
+            timeStamp = new Date(dataTimeStamp.getTime());
+        }
+        return timeStamp;
     }
 
     /**

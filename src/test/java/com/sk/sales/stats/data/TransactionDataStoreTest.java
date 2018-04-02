@@ -1,6 +1,7 @@
 package com.sk.sales.stats.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -73,6 +74,18 @@ public class TransactionDataStoreTest {
         }
         final StatsResponse response = dataStore.getSalesStatsInDataStore();
         assertEquals(600.0, response.getTotalSalesAmount(), 0.001);
+    }
+
+    @Test
+    public void testGetSalesStatsInDataStore_NullDataStore() {
+        assertNull(dataStore.getSalesStatsInDataStore());
+    }
+
+    @Test
+    public void testGetSalesStatsInDataStore_NullElementsDataStore() {
+        dataStore.addSalesData(0.0, null);
+        final StatsResponse response = dataStore.getSalesStatsInDataStore();
+        assertEquals(0.0, response.getTotalSalesAmount(), 0.001);
     }
 
 }

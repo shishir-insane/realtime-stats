@@ -88,6 +88,8 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
         double totalSalesAmount = 0.0;
         double totalSalesQty = 0.0;
         if (null != tailData) {
+            // The elements by below iterator will be returned in order from
+            // first (head) to last (tail).
             final Iterator<AggregatedSalesData> itr = iterator();
             while (itr.hasNext()) {
                 final AggregatedSalesData data = itr.next();
@@ -124,9 +126,16 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
      */
     private boolean shouldInsertAtTail(final Date saleTimestamp) {
         boolean shouldInsert = false;
-        final long saleTimeStampInSecs = saleTimestamp.getTime() / 1000;
-        if (null == tailData || saleTimeStampInSecs - tailData.getDataTimeStampInSecs() > 0) {
+        if (null == tailData) {
+            // check if the data store size is 0
             shouldInsert = true;
+        } else if (null != saleTimestamp) {
+            // check if the aggregation for the requested timestamp second is
+            // present in data store
+            final long saleTimeStampInSecs = saleTimestamp.getTime() / 1000;
+            if (saleTimeStampInSecs - tailData.getDataTimeStampInSecs() > 0) {
+                shouldInsert = true;
+            }
         }
         return shouldInsert;
     }

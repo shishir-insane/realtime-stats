@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.springframework.stereotype.Component;
 
+import com.sk.sales.stats.aop.TimedLog;
 import com.sk.sales.stats.dto.StatsResponse;
 import com.sk.sales.stats.util.AppUtils;
 
@@ -50,6 +51,7 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
      * @param saleTimestamp
      *            the sale timestamp
      */
+    @TimedLog
     public void addSalesData(final double salesAmount, final Date saleTimestamp) {
         add(new AggregatedSalesData(salesAmount, saleTimestamp));
     }
@@ -83,6 +85,7 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
      *
      * @return the sales stats in data store
      */
+    @TimedLog
     public StatsResponse getSalesStatsInDataStore() {
         StatsResponse response = null;
         double totalSalesAmount = 0.0;

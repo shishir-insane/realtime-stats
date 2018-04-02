@@ -1,3 +1,9 @@
+/**
+ * StatsController.java
+ * realtime-stats
+ * 
+ * @author Shishir Kumar
+ */
 package com.sk.sales.stats.controller;
 
 import org.springframework.http.MediaType;

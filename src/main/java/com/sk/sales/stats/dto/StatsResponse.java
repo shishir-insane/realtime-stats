@@ -1,3 +1,9 @@
+/**
+ * StatsResponse.java
+ * realtime-stats
+ * 
+ * @author Shishir Kumar
+ */
 package com.sk.sales.stats.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;

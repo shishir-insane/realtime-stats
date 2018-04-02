@@ -8,6 +8,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sk.sales.stats.dto.StatsResponse;
 import com.sk.sales.stats.util.AppUtils;
 
 public class TransactionDataStoreTest {
@@ -61,6 +62,17 @@ public class TransactionDataStoreTest {
     @Test(expected = CloneNotSupportedException.class)
     public void testClone() throws CloneNotSupportedException {
         dataStore.clone();
+    }
+
+    @Test
+    public void testGetSalesStatsInDataStore() {
+        final Calendar calendar = Calendar.getInstance();
+        for (int i = 0; i < AppUtils.DEFAULT_SIZE + 1; i++) {
+            dataStore.addSalesData(10.0, calendar.getTime());
+            calendar.add(Calendar.SECOND, 1);
+        }
+        final StatsResponse response = dataStore.getSalesStatsInDataStore();
+        assertEquals(600.0, response.getTotalSalesAmount(), 0.001);
     }
 
 }

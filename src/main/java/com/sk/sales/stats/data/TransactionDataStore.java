@@ -7,10 +7,12 @@
 package com.sk.sales.stats.data;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.springframework.stereotype.Component;
 
+import com.sk.sales.stats.dto.StatsResponse;
 import com.sk.sales.stats.util.AppUtils;
 
 /**
@@ -36,6 +38,7 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
      */
     public TransactionDataStore() {
         super();
+        // if tailData is null, the size of the data store is 0
         tailData = null;
     }
 
@@ -75,6 +78,31 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
         return isInserted;
     }
 
+    /**
+     * Gets the sales stats in data store.
+     *
+     * @return the sales stats in data store
+     */
+    public StatsResponse getSalesStatsInDataStore() {
+        StatsResponse response = null;
+        double totalSalesAmount = 0.0;
+        double totalSalesQty = 0.0;
+        if (null != tailData) {
+            final Iterator<AggregatedSalesData> itr = iterator();
+            while (itr.hasNext()) {
+                final AggregatedSalesData data = itr.next();
+                if (null != data) {
+                    totalSalesAmount += data.getTotalAmount();
+                    totalSalesQty += data.getSalesQty();
+                }
+            }
+            if (totalSalesQty > 0) {
+                response = new StatsResponse(totalSalesAmount, totalSalesAmount / totalSalesQty);
+            }
+        }
+        return response;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -90,7 +118,9 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
      *
      * @param saleTimestamp
      *            the sale timestamp
-     * @return true, if successful
+     * @return true, if either the size of the queue is zero or the aggregated
+     *         sales data for the given second from the timestamp is already
+     *         present at the tail of the queue
      */
     private boolean shouldInsertAtTail(final Date saleTimestamp) {
         boolean shouldInsert = false;

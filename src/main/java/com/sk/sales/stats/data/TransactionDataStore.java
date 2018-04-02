@@ -10,9 +10,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.springframework.stereotype.Component;
-
-import com.sk.sales.stats.aop.TimedLog;
 import com.sk.sales.stats.dto.StatsResponse;
 import com.sk.sales.stats.util.AppUtils;
 
@@ -27,46 +24,77 @@ import com.sk.sales.stats.util.AppUtils;
  *
  * The type of elements of this class is defined in AggregatedSalesData.
  */
-@Component
 public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesData> {
 
     private static final long serialVersionUID = 2435457440516806502L;
+
+    private static volatile TransactionDataStore transactionDataStore;
 
     private AggregatedSalesData tailData;
 
     /**
      * Instantiates a new transaction data store.
      */
-    public TransactionDataStore() {
+    private TransactionDataStore() {
         super();
+        // a raw prevention from instantiation from Reflection API
+        if (transactionDataStore != null) {
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
         // if tailData is null, the size of the data store is 0
         tailData = null;
     }
 
     /**
-     * Adds the sales data.
+     * Gets the single instance of TransactionDataStore.
+     *
+     * @return single instance of TransactionDataStore
+     */
+    public static TransactionDataStore getInstance() {
+        if (transactionDataStore == null) {
+            synchronized (TransactionDataStore.class) {
+                if (transactionDataStore == null) {
+                    transactionDataStore = new TransactionDataStore();
+                }
+            }
+        }
+        return transactionDataStore;
+    }
+
+    /**
+     * Read resolve to make TransactionDataStore singleton from serialize and
+     * deserialize operations.
+     *
+     * @return the transaction data store
+     */
+    protected TransactionDataStore readResolve() {
+        return getInstance();
+    }
+
+    /**
+     * Sets the tail data.
+     *
+     * @param tailData
+     *            the new tail data
+     */
+    public void setTailData(final AggregatedSalesData tailData) {
+        this.tailData = tailData;
+    }
+
+    /**
+     * This method to add the sales data to the data store while bounding the
+     * max size of the data collection. As the queue size is bounded after
+     * insertion, this method will never throw IllegalStateException or return
+     * false.
      *
      * @param salesAmount
      *            the sales amount
      * @param saleTimestamp
      *            the sale timestamp
+     * @return true if element is added or not
      */
-    @TimedLog
-    public void addSalesData(final double salesAmount, final Date saleTimestamp) {
-        add(new AggregatedSalesData(salesAmount, saleTimestamp));
-    }
-
-    /**
-     * This method to add the data to the data store while bounding the max size
-     * of the data collection. As the queue size is bounded after insertion,
-     * this method will never throw IllegalStateException or return false.
-     *
-     * @param aggregatedSalesData
-     *            the aggregated sales data
-     * @return true, if successful
-     */
-    @Override
-    public boolean add(final AggregatedSalesData aggregatedSalesData) {
+    public boolean addSalesData(final double salesAmount, final Date saleTimestamp) {
+        final AggregatedSalesData aggregatedSalesData = new AggregatedSalesData(salesAmount, saleTimestamp);
         boolean isInserted = false;
         if (shouldInsertAtTail(aggregatedSalesData.getDataTimeStamp())) {
             isInserted = offer(aggregatedSalesData);
@@ -81,11 +109,22 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
     }
 
     /**
+     * Use addSalesData(double, Date) to insert new data to data store.
+     *
+     * @param aggregatedSalesData
+     *            the aggregated sales data
+     * @return true, if successful
+     */
+    @Override
+    public boolean add(final AggregatedSalesData aggregatedSalesData) {
+        throw new RuntimeException("Use addSalesData(double, Date) to insert new data to data store.");
+    }
+
+    /**
      * Gets the sales stats in data store.
      *
      * @return the sales stats in data store
      */
-    @TimedLog
     public StatsResponse getSalesStatsInDataStore() {
         StatsResponse response = null;
         double totalSalesAmount = 0.0;

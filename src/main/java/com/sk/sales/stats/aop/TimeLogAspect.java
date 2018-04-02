@@ -1,7 +1,7 @@
 /**
  * TimeLogAspect.java
  * realtime-stats
- * 
+ *
  * @author Shishir Kumar
  */
 package com.sk.sales.stats.aop;
@@ -22,12 +22,14 @@ public class TimeLogAspect {
         final long start = System.currentTimeMillis();
         Object value;
         try {
+            log.info("Entered {}.{}", proceedingJoinPoint.getSignature().getDeclaringType().getSimpleName(),
+                    proceedingJoinPoint.getSignature().getName());
             value = proceedingJoinPoint.proceed();
         } catch (final Throwable throwable) {
             throw throwable;
         } finally {
             final long duration = System.currentTimeMillis() - start;
-            log.info("{}.{} took {} ms", proceedingJoinPoint.getSignature().getDeclaringType().getSimpleName(),
+            log.info("Exited {}.{} took {} ms", proceedingJoinPoint.getSignature().getDeclaringType().getSimpleName(),
                     proceedingJoinPoint.getSignature().getName(), duration);
         }
         return value;

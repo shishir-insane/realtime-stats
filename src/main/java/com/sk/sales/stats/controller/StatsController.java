@@ -25,11 +25,22 @@ public class StatsController {
     @Autowired
     private StatsService statsService;
 
+    /**
+     * Update sales.
+     *
+     * @param salesAmount
+     *            the sales amount
+     */
     @RequestMapping(method = RequestMethod.POST, value = AppUtils.ENDPOINT_SALES)
     public void updateSales(@RequestParam(AppUtils.REQ_PARAM_SALES_AMOUNT) final double salesAmount) {
         statsService.updateSalesData(salesAmount, new Date());
     }
 
+    /**
+     * Gets the real time stats.
+     *
+     * @return the real time stats
+     */
     @RequestMapping(method = RequestMethod.GET, value = AppUtils.ENDPOINT_STATS, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public StatsResponse getRealTimeStats() {
         return statsService.getRealTimeStats();

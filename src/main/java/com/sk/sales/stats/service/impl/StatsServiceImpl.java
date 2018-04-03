@@ -23,6 +23,9 @@ public class StatsServiceImpl implements StatsService {
 
     private StatsResponse stats;
 
+    /**
+     * Instantiates a new stats service impl.
+     */
     public StatsServiceImpl() {
         transactionDataStore = TransactionDataStore.getInstance();
         stats = new StatsResponse();
@@ -60,7 +63,7 @@ public class StatsServiceImpl implements StatsService {
     @Scheduled(fixedDelay = 100)
     public void updateRealTimeStats() {
         final StatsResponse latestStats = transactionDataStore.getSalesStatsInDataStore();
-        this.stats = latestStats;
+        stats = latestStats;
     }
 
 }

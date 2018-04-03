@@ -17,6 +17,16 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class TimeLogAspect {
+    
+    /**
+     * Time.
+     *
+     * @param proceedingJoinPoint
+     *            the proceeding join point
+     * @return the object
+     * @throws Throwable
+     *             the throwable
+     */
     @Around("@annotation(com.sk.sales.stats.aop.TimedLog) && execution(public * *(..))")
     public Object time(final ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         final long start = System.currentTimeMillis();

@@ -21,6 +21,9 @@ public final class AppUtils {
     public static final String RES_PARAM_TOTAL_SALES_AMT = "total_sales_amount";
     public static final String RES_PARAM_AVG_AMT_PER_ORDER = "average_amount_per_order";
 
+    /**
+     * Instantiates a new app utils.
+     */
     private AppUtils() {
         // Hidden constructor
     }

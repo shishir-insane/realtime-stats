@@ -1,7 +1,14 @@
+/**
+ * StatsServiceImpl.java
+ * realtime-stats
+ *
+ * @author Shishir Kumar
+ */
 package com.sk.sales.stats.service.impl;
 
 import java.util.Date;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.sk.sales.stats.aop.TimedLog;
@@ -14,8 +21,11 @@ public class StatsServiceImpl implements StatsService {
 
     private final TransactionDataStore transactionDataStore;
 
+    private StatsResponse stats;
+
     public StatsServiceImpl() {
         transactionDataStore = TransactionDataStore.getInstance();
+        stats = new StatsResponse();
     }
 
     /*
@@ -24,7 +34,6 @@ public class StatsServiceImpl implements StatsService {
      * @see com.sk.sales.stats.service.StatsService#updateSalesData(double)
      */
     @Override
-    @TimedLog
     public void updateSalesData(final double salesAmount, final Date saleTimestamp) {
         transactionDataStore.addSalesData(salesAmount, saleTimestamp);
     }
@@ -37,11 +46,21 @@ public class StatsServiceImpl implements StatsService {
     @Override
     @TimedLog
     public StatsResponse getRealTimeStats() {
-        StatsResponse response = transactionDataStore.getSalesStatsInDataStore();
-        if (null == response) {
-            response = new StatsResponse();
+        if (null == stats) {
+            stats = new StatsResponse();
         }
-        return response;
+        return stats;
+    }
+
+    /**
+     * Update real time stats at every 100 ms.
+     */
+    @TimedLog
+    @Override
+    @Scheduled(fixedDelay = 100)
+    public void updateRealTimeStats() {
+        final StatsResponse latestStats = transactionDataStore.getSalesStatsInDataStore();
+        this.stats = latestStats;
     }
 
 }

@@ -44,6 +44,5 @@ public class StatsServiceImplTest {
     @After
     public void destroy() {
         dataStore.clear();
-        dataStore.setTailData(null);
     }
 }

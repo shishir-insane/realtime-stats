@@ -102,6 +102,5 @@ public class TransactionDataStoreTest {
     @After
     public void destroy() {
         dataStore.clear();
-        dataStore.setTailData(null);
     }
 }

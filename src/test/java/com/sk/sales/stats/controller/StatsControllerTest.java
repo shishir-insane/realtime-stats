@@ -95,6 +95,5 @@ public class StatsControllerTest {
     @After
     public void destroy() {
         dataStore.clear();
-        dataStore.setTailData(null);
     }
 }

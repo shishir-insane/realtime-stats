@@ -10,4 +10,6 @@ public interface StatsService {
 
     StatsResponse getRealTimeStats();
 
+    void updateRealTimeStats();
+
 }

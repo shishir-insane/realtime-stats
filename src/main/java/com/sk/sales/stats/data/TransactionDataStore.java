@@ -7,7 +7,6 @@
 package com.sk.sales.stats.data;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.sk.sales.stats.dto.StatsResponse;
@@ -72,16 +71,6 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
     }
 
     /**
-     * Sets the tail data.
-     *
-     * @param tailData
-     *            the new tail data
-     */
-    public void setTailData(final AggregatedSalesData tailData) {
-        this.tailData = tailData;
-    }
-
-    /**
      * This method to add the sales data to the data store while bounding the
      * max size of the data collection. As the queue size is bounded after
      * insertion, this method will never throw IllegalStateException or return
@@ -129,12 +118,12 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
         StatsResponse response = null;
         double totalSalesAmount = 0.0;
         double totalSalesQty = 0.0;
-        if (null != tailData) {
-            // The elements by below iterator will be returned in order from
-            // first (head) to last (tail).
-            final Iterator<AggregatedSalesData> itr = iterator();
-            while (itr.hasNext()) {
-                final AggregatedSalesData data = itr.next();
+        if (!isEmpty()) {
+            // An array containing all of the elements in this queue, in proper
+            // sequence; the runtime type of the returned array is that of the
+            // specified array.
+            final AggregatedSalesData[] dataArray = toArray(new AggregatedSalesData[AppUtils.DEFAULT_SIZE]);
+            for (final AggregatedSalesData data : dataArray) {
                 if (null != data) {
                     totalSalesAmount += data.getTotalAmount();
                     totalSalesQty += data.getSalesQty();
@@ -168,8 +157,8 @@ public class TransactionDataStore extends ConcurrentLinkedQueue<AggregatedSalesD
      */
     private boolean shouldInsertAtTail(final Date saleTimestamp) {
         boolean shouldInsert = false;
-        if (null == tailData) {
-            // check if the data store size is 0
+        if (isEmpty()) {
+            // check if the data store is empty
             shouldInsert = true;
         } else if (null != saleTimestamp) {
             // check if the aggregation for the requested timestamp second is
